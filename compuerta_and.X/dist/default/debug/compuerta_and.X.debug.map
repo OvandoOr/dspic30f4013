@@ -1,0 +1,58 @@
+Microchip Technology Inc, v1.41 (B)
+
+Tool Name:
+  c:\program files (x86)\microchip\xc16\v1.41\bin\bin\..\bin/elf-ld.exe
+
+Command:
+  -p30F4013 \
+  --mdfp=C:/Program Files (x86)/Microchip/MPLABX/v5.30/packs/Microchip/dsPIC30F_DFP/1.1.32/xc16 \
+  -o \
+  dist/default/debug/compuerta_and.X.debug.elf \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/.. \
+  -LC:/Program Files (x86)/Microchip/MPLABX/v5.30/packs/Microchip/dsPIC30F_DFP/1.1.32/xc16/bin/../support/dsPIC30F/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../lib \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/PIC24E/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/PIC24F/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/PIC24H/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/dsPIC30F/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/dsPIC33C/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/dsPIC33E/gld \
+  -Lc:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../support/dsPIC33F/gld \
+  build/default/debug/main_compuerta_and.o \
+  build/default/debug/newmain.o \
+  --defsym=__MPLAB_BUILD=1 \
+  --defsym=__MPLAB_DEBUG=1 \
+  --defsym=__DEBUG=1 \
+  --defsym=__MPLAB_DEBUGGER_SIMULATOR=1 \
+  -Tp30F4013.gld.00 \
+  --stack=16 \
+  --check-sections \
+  --data-init \
+  --pack-data \
+  --handles \
+  --isr \
+  --no-gc-sections \
+  --fill-upper=0 \
+  --stackguard=16 \
+  --no-force-link \
+  --smart-io \
+  -Map=dist/default/debug/compuerta_and.X.debug.map \
+  --report-mem \
+  --memorysummary \
+  dist/default/debug/memoryfile.xml \
+  -start-group \
+  --library=lega-pic30-elf \
+  --library=m-elf \
+  --library=lega-c-elf \
+  -end-group \
+
+
+Optional library libp30F4013.a not found
+Archive member included because of file (symbol)
+
+c:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
+                              (__resetPRI)
+c:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../lib\liblega-pic30-elf.a(data_init_standard.o)
+                              c:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o) (__data_init_standard)
+c:/program files (x86)/microchip/xc16/v1.41/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
+                              (__crt_start_mode_normal)
