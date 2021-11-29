@@ -1,0 +1,307 @@
+/*
+ * File:   main_lcd.c
+ * Author: Ovando Brandon
+ *
+ * Created on 20 de mayo de 2018, 10:08 PM
+ */
+
+#define LOW 0
+#define C1 PORTBbits.RB0
+#define C2 PORTBbits.RB1
+#define C3 PORTBbits.RB2
+#define C4 PORTBbits.RB3
+#define R1 PORTBbits.RB4 
+#define R2 PORTBbits.RB5
+#define R3 PORTBbits.RB8
+#define R4 PORTBbits.RB7
+
+int contador; // Variable contador
+char cad_contador[6], value[20], ingreso, resul[20]; // Cadena con contador para enviar a la pantalla LCD
+int opcion=1, ret=100, led_T=100;
+int i,j;
+int teclado(void);
+void retardo(int t);
+
+int main()
+{
+contador = 0; // Inicia contador
+TRISB = 0x000F;
+TRISD=0;
+ADPCFG=0xFFFF;
+LATB=0;
+LATD=0;
+
+// Inicializa la pantalla en modo 4 bits de 2 renglones
+iniciaLCD(FOUR_BIT & TWO_LINE );
+while(busyLCD()); // Espera a que la pantalla LCD se desocupe
+putsLCD("Calculadora"); 
+while(busyLCD());
+retardo(1000);
+setDDRamAddr(0x00);
+while(busyLCD());
+putsLCD("            ");
+while(busyLCD());
+setDDRamAddr(0x00);
+_CNIP = 4; //Ajusta la prioridad a 4 (valor predeterminado)
+// Paso 3. Limpia la bandera de interrupcion
+_CNIF = 0;
+// Paso 4. Habilita la interrupcion externa 0
+_CN2IE=1;
+_CN3IE=1;
+_CN4IE=1;
+_CN5IE=1;
+_CNIE = 1;
+
+/* Ciclo principal */
+while(1)
+{ 
+    LATB=0x00F0;
+    LATD=~LATD;
+    retardo(led_T);
+} // Ciclo principal
+return 0;
+} //main
+/* RUTINA DE SERVICIO DE INTERRUPCION */
+// Esta rutina se ejecuta cada vez que se produce un cambio en los puertos cn
+void __attribute__((interrupt, no_auto_psv)) _CNInterrupt( void)
+{
+retardo(ret); // Espera a que se estabilice el nivel de voltaje
+    contador = teclado(); //lectura de teclado
+    if(contador != -1){
+    if(contador<10)ingreso= contador+'0'; 
+    else if(contador==10) ingreso='A';
+    else if(contador==11) ingreso='B';
+    else if(contador==12) ingreso='C';
+    else if(contador==13) ingreso='D';
+    else if(contador==14) ingreso='#';
+    else if(contador==15) ingreso='*';
+    
+    if(ingreso=='#')
+    {
+        rpn_conver(value);
+        sprintf(resul, "%f",rpn_calcu(resp));
+        while(busyLCD());
+        setDDRamAddr(0x40);
+        while(busyLCD());
+        putsLCD(resul);
+        while(busyLCD());
+        memset(resp, '\0', sizeof resp);
+        memset(resul, '\0', sizeof resul);
+        memset(value, '\0', sizeof value);
+
+    }
+    else if(ingreso=='*')
+    {
+        memset(resp, '\0', sizeof resp);
+        memset(resul, '\0', sizeof resul);
+        memset(value, '\0', sizeof value);
+        //resp=0;
+        setDDRamAddr(0x00); // Se mueve al renglon 1
+        while(busyLCD());
+        putsLCD("                ");
+        while(busyLCD());
+        setDDRamAddr(0x40); // Se mueve al renglon 2
+        putsLCD("                ");
+        while(busyLCD());
+        setDDRamAddr(0x00);
+        while(busyLCD());
+
+
+    }
+    else if(ingreso=='D')
+    {
+        
+        opcion++;
+        if(opcion>4)opcion=1;
+        led_T=100*opcion;
+        
+    }
+        
+    else
+    {
+        if(ingreso=='A' && opcion==1)ingreso='+';
+        if(ingreso=='A' && opcion==2)ingreso='/';
+        if(ingreso=='A' && opcion==3)ingreso='S';
+        if(ingreso=='A' && opcion==4)ingreso='E';
+        
+        if(ingreso=='B' && opcion==1)ingreso='-';
+        if(ingreso=='B' && opcion==2)ingreso='^';
+        if(ingreso=='B' && opcion==3)ingreso='C';
+        if(ingreso=='B' && opcion==4)ingreso='(';
+        
+        if(ingreso=='C' && opcion==1)ingreso='*';
+        if(ingreso=='C' && opcion==2)ingreso='¬';
+        if(ingreso=='C' && opcion==3)ingreso='T';
+        if(ingreso=='C' && opcion==4)ingreso=')';
+        
+        
+        sprintf(value, "%s%c",value, ingreso);
+        while(busyLCD());
+        setDDRamAddr(0x40); // Se mueve al renglon 2
+        while(busyLCD());
+        putsLCD("                ");
+        while(busyLCD());
+        setDDRamAddr(0x00);
+        while(busyLCD());
+        putsLCD(value); // Escribe el valor de la operacion
+        while(busyLCD());
+    }
+
+    }
+    _CNIF = 0; //Limpia la bandera de interrupción antes de salir
+    
+} //CNInterrupt
+
+
+//Funcion retardo
+void retardo(int t)
+{
+for(i=0;i<t;i++) //random delay
+for(j=0;j<2000;j++);
+}
+
+int teclado(void)
+{
+
+R1 = 1; R2= 0; R3= 0; R4=0; 
+retardo(ret);
+if (R1 && C1)
+    {      
+    retardo(ret);
+     if (C1)
+       {                              
+            return 13;
+       }
+    }
+else if (R1 && C2)
+    {                               
+    retardo(ret);
+     if (C2)
+       {                              
+            return 14;
+       }
+    }
+else if (R1 && C3)
+    {                              
+    retardo(ret);
+     if (C3)
+       {                              
+            return 0;
+       }
+    }
+else if (R1 && C4)
+    {                               
+     retardo(ret);
+     if (C4)
+       {                              
+            return 15;
+       }
+    }
+    
+    
+R1 = 0; R2= 1; R3= 0; R4=0; 
+retardo(ret);
+if (C1)
+    {      
+    retardo(ret);
+     if (C1)
+       {                              
+            return 12;
+       }
+    }
+else if (C2)
+    {                               
+    retardo(ret);
+     if (C2)
+       {                              
+            return 9;
+       }
+    }
+else if (C3)
+    {                              
+    retardo(ret);
+     if (C3)
+       {                              
+            return 8;
+       }
+    }
+else if (C4)
+    {                               
+     retardo(ret);
+     if (C4)
+       {                              
+            return 7;
+       }
+    }
+ 
+R1 = 0; R2= 0; R3= 1; R4=0;  
+retardo(ret);
+if (R3 && C1)
+    {      
+    retardo(ret);
+     if (C1)
+       {                              
+            return 11;
+       }
+    }
+else if (R3 && C2)
+    {                               
+    retardo(ret);
+     if (C2)
+       {                              
+            return 6;
+       }
+    }
+else if (R3 && C3)
+    {                              
+    retardo(ret);
+     if (C3)
+       {                              
+            return 5;
+       }
+    }
+else if (R3 && C4)
+    {                               
+     retardo(ret);
+     if (C4)
+       {                              
+            return 4;
+       }
+    }
+ 
+R1 = 0; R2= 0; R3= 0; R4=1;    
+retardo(ret);
+if (C1)
+    {      
+    retardo(ret);
+     if (C1)
+       {                              
+            return 10;
+       }
+    }
+else if (C2)
+    {                               
+    retardo(ret);
+     if (C2)
+       {                              
+            return 3;
+       }
+    }
+else if (C3)
+    {                              
+    retardo(ret);
+     if (C3)
+       {                              
+            return 2;
+       }
+    }
+else if (C4)
+    {                               
+     retardo(ret);
+     if (C4)
+       {                              
+            return 1;
+       }
+    }
+   return -1;
+}

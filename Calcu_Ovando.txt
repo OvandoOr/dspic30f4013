@@ -1,0 +1,93 @@
+/*
+ * File:   Calculadora_Ovando.c
+ * Author: BRANDON OVANDO
+ *
+ * Created on 11 de mayo de 2018, 11:50 AM
+ */
+
+
+#include <xc.h>
+#include<p30f4013.h>
+
+
+/* Macros para configurar los bits de configuración */
+
+De preferencia cambien los bits de configuracion con los #pragma config
+
+
+/*
+_FOSC(CSW_FSCM_OFF & FRC_PLL4); // Interna 7.37 MHZ
+_FWDT(WDT_OFF); //watch dog timer off
+_FBORPOR(MCLR_EN & PWRT_OFF); //Habilita el reset por el pin MCLR y desactiva el temporizador de encendido
+_FGS(CODE_PROT_OFF); //Deshabilita la proteccion de codigo*/
+
+
+int opcion=0, A, A1, A2, B, C=0;
+unsigned int i,j,x,delay=100;
+
+void main(void) {
+    TRISA=0;
+    TRISB=0;
+    ADPCFG=0xFFFF;    
+    TRISC=0xFFFF;
+    TRISD=0XFFFF;
+    TRISF=0xFF3F;
+    
+    LATA=0;
+    LATB=0;
+    PORTC=0;
+    PORTD=0;
+    PORTF=0;
+    
+    while(1)
+    {   
+	//preguntenme o vean el datasheet me da hueva escribir el porque de el 
+	//recorrimiento y eliminacion de bits
+        opcion=PORTC;
+        A1=PORTD & 0x000F;
+        A2=PORTD >> 4;
+        A=(A1+A2) & 0x003F;
+        B=PORTF & 0x003F;
+        
+       switch(opcion)
+       {
+           case 0x2000:
+               C=A+B;//suma
+               _LATF6=0;
+               break;
+           case 0x4000:
+               C=A-B;//resta
+               _LATF6=0;
+               break;
+            case 0x6000:
+               C=A*B;//multiplicacion
+               _LATF6=0;
+               break;
+           case 0x8000:
+               //funcion division
+               _LATF6=1;
+               break;
+           default:
+               C=0;
+               _LATF6=0;
+               break;
+       }
+       if(C<0)
+       {
+         C=C*(-1);
+         LATA=0xFFFF;
+       }
+       else
+           LATA=0;
+       LATB=C;
+      retardo(delay); 
+    }
+    return;
+}
+
+/*
+ * File:   Calculadora_Ovando.c
+ * Author: BRANDON OVANDO
+ *
+ * Created on 11 de mayo de 2018, 11:50 AM
+ */

@@ -1,0 +1,50 @@
+/*
+ * File:   hola_main.c
+ * Author: Brandon Ovando
+ *
+ * Created on 13 de mayo de 2018, 06:03 PM
+ */
+
+
+#include <xc.h>
+#include <p30F4013.h>
+
+// FOSC
+#pragma config FOSFPR = FRC_PLL4        // Oscillator (XT w/PLL 16x)
+#pragma config FCKSMEN = CSW_FSCM_OFF   // Clock Switching and Monitor (Sw Disabled, Mon Disabled)
+
+// FWDT
+#pragma config FWPSB = WDTPSB_16        // WDT Prescaler B (1:16)
+#pragma config FWPSA = WDTPSA_512       // WDT Prescaler A (1:512)
+#pragma config WDT = WDT_OFF            // Watchdog Timer (Disabled)
+
+// FBORPOR
+#pragma config FPWRT = PWRT_OFF         // POR Timer Value (Timer Disabled)
+#pragma config BODENV = BORV20          // Brown Out Voltage (Reserved)
+#pragma config BOREN = PBOR_ON          // PBOR Enable (Enabled)
+#pragma config MCLRE = MCLR_EN          // Master Clear Enable (Enabled)
+
+// FGS
+#pragma config GWRP = GWRP_OFF          // General Code Segment Write Protect (Disabled)
+#pragma config GCP = CODE_PROT_OFF      // General Segment Code Protection (Disabled)
+
+// FICD
+#pragma config ICS = ICS_PGD            // Comm Channel Select (Use PGC/EMUC and PGD/EMUD)
+unsigned int number1,number2; //variables para el delay
+
+
+void main(void)
+{
+ADPCFGbits.PCFG0=1;// pin B0 declarado como digital
+TRISBbits.TRISB0=0;//pin B0 declarado como salida
+
+LATBbits.LATB0 = 0;//pin B0 apagado
+while(1)
+{
+for(number1=0;number1<500;number1++) //delay al azar
+for(number2=0;number2<200;number2++);
+LATBbits.LATB0=~LATBbits.LATB0; //NOT del estado anterior, prendido/apagado
+for(number1=0;number1<500;number1++) //delay al azar
+for(number1=0;number1<2000;number1++);
+}//while
+}//main
